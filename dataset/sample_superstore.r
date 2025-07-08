@@ -63,3 +63,26 @@ mean_sales <- mean(superstore$Sales, na.rm = TRUE)
 
 #    Method A: Base R replacement
 superstore$Sales[is.na(superstore$Sales)] <- mean_sales
+
+# 1. Group by Region and sum Sales & Profit
+region_summary <- aggregate(
+  cbind(Sales, Profit) ~ Region,
+  data = superstore,
+  FUN  = sum
+)
+print(region_summary)
+
+# 2. Create Discount Level column
+superstore$Discount.Level <- with(
+  superstore,
+  ifelse(Discount <= 0.2, "Low",
+    ifelse(Discount <= 0.5, "Medium", "High")
+  )
+)
+# Quick check
+table(superstore$Discount.Level)
+# 3. Sort the entire data frame by Sales descending
+superstore_sorted <- superstore[order(-superstore$Sales), ]
+
+# Inspect the top rows
+head(superstore_sorted)

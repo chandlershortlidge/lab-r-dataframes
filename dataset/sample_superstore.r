@@ -1,10 +1,65 @@
-# Lab | Exploring the `sample_superstore` Dataset
 
-In this lab, you will work with the `sample_superstore` dataset to practice creating, inspecting, and manipulating dataframes. Follow the steps below to complete the tasks.
+# 1. Import the data
+superstore <- read.csv("dataset/Sample - Superstore.csv", stringsAsFactors = FALSE)
+# Verify it loaded correctly:
+head(superstore)
+summary(superstore)
+str(superstore)
 
-## Step 1: Importing the Dataset
+sales_vec <- superstore$Sales
 
-- Load the `sample_superstore` dataset into a dataframe. You can find this dataset in the `datasets` package or download it as a CSV file from online sources.
-- Save the dataframe as `superstore`.
-  
-  **Hint:** Use the `read.csv()` or `read_excel()` function to import the dataset.
+subset_15 <- superstore[1:15, c("Order.ID", "Customer.Name", "Sales")]
+# Inspect
+subset_15
+
+num_rows <- nrow(superstore)
+num_cols <- ncol(superstore)
+
+cat("Number of rows:", num_rows, "\n")
+cat("Number of columns:", num_cols, "\n")
+
+# 1. Rows where Profit > 100
+profit_over_100 <- superstore[superstore$Profit > 100, ]
+
+# 2. Rows where Category == "Furniture" AND Sales > 500
+furniture_big_sales <- superstore[
+  superstore$Category == "Furniture" & superstore$Sales > 500,
+]
+head(furniture_big_sales)
+
+# 3. Rows where Region == "West" AND Quantity > 5
+west_high_qty <- superstore[
+  superstore$Region == "West" & superstore$Quantity > 5,
+]
+head(west_high_qty)
+
+# 1. Add Profit Margin = (Profit / Sales) * 100
+superstore$Profit.Margin <- (superstore$Profit / superstore$Sales) * 100
+
+# 2. Round Sales to 2 decimal places
+superstore$Sales <- round(superstore$Sales, 2)
+
+# 3. Remove the Postal Code column
+#    read.csv() will have turned "Postal Code" into Postal.Code
+superstore <- subset(superstore, select = -Postal.Code)
+
+# Verify the changes
+head(superstore)
+str(superstore)
+
+
+# 1. Check for missing values
+#    Count missing per column
+missing_per_col <- colSums(is.na(superstore))
+print(missing_per_col)
+
+any_na <- anyNA(superstore)
+cat("Any missing values in the data frame? ", any_na, "\n\n")
+
+
+# 3. Replace missing values in Sales with the column mean
+#    First, compute the mean of Sales (excluding NAs)
+mean_sales <- mean(superstore$Sales, na.rm = TRUE)
+
+#    Method A: Base R replacement
+superstore$Sales[is.na(superstore$Sales)] <- mean_sales
